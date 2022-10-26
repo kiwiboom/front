@@ -13,6 +13,7 @@
 <script>
 import { Graph } from "@antv/x6";
 import api from '/src/js/api.js'
+import dateApi from '/src/js/getDateApi.js' 
 import { DagreLayout } from '@antv/layout'
 export default {
   name: 'ProcessDetail',
@@ -29,11 +30,15 @@ export default {
                 port:1234,
                 path:"/designDept"
             },
-            proExecution:[]//拿到的流程
+            //一个executionId-》多个proExecutions
+            // 一个proExecution-》多个tasks
+            Tasks_List: [],//tasks的list，数组元素是tasks数组
+            proExecutions: []//拿到的流程
         }
     },
     mounted() {
-      this.getProExecutionsByExecutionId();//根据传入流程ID查找流程
+      dateApi.getsometest();
+      this.initDate();//利用axios初始化流程
       this.initGraph();
       this.nodeAddEvent();//启动节点可以进行点击并且删除
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
@@ -41,16 +46,28 @@ export default {
   },
   methods:{
     /**
-     * 根据传入流程ID查找流程
-     * 
-     */
-    getProExecutionsByExecutionId()
+     *  利用axios初始化流程
+     * */
+     async initDate()
     {
-      api.getProExecutionsByExecutionId(this.executionId).then(res=>{
-        this.proExecution = res.data.valueMap.data;
-        console.log("传入成功getProExecutions:")
-        console.log(this.proExecution)
-      })
+      var proExecutions = [];//拿到的流程
+      proExecutions = await dateApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找流程
+      this.proExecutions = proExecutions;
+      // console.log(this.proExecutions);
+      var i;
+      var proExecutionsLength = proExecutions.length;
+      console.log("这是this.proExceutionsLength:"+proExecutionsLength)
+      var tasks = []
+      for(i=0;i<proExecutionsLength;i++)
+      {
+        proExecution = proExecutions[i];
+        tasks = getTasksByProExecutionId(proExecution.id)
+        console.log("当前是：第"+i+'的tasks')
+        console.log(tasks)
+        this.Tasks_List.push(tasks)
+      }
+      console.log("这是TasksList")
+      console.log(this.Tasks_List)
     },
     goBack(){
       this.$router.go(-1);
