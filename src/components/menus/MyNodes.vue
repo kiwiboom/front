@@ -45,14 +45,6 @@ export default {
   data() {
     return {
       processNodes:[],//读取axios的数据
-
-      // js文件中示例的用户列表数据
-      portlist: [
-        { id: 1, name: '潍柴设计部', type: 1,ip: '127.0.0.1',port: 1234, path: "/designDept"},
-        { id: 2, name: '潍柴零件供应商', type: 1,ip: '127.0.0.1',port: 1234, path: "/partsSupplier"},
-        { id: 3, name: '潍柴主机厂', type: 1,ip: '127.0.0.1',port: 1234, path: "/hostPlant"},
-        { id: 4, name: '潍柴实验相关部门', type: 1,ip: '127.0.0.1',port: 1234, path: "/experimentDept"},
-      ],
     }
   },
 }

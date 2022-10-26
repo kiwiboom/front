@@ -1,6 +1,6 @@
 <template>
   <button type="button" class="btn btn-light btn-sm" @click="goBack">后退</button>
-  <h4 class="text-center">流程详情 --- {{id}}</h4>
+  <h4 class="text-center">流程详情 --- {{executionId}}</h4>
   <div id="container"></div>
   <div>选中的节点id：{{currentNode.id}}</div>
   <div>选中的节点name:{{currentNode.name}}</div>
@@ -16,7 +16,7 @@ import api from '/src/js/api.js'
 import { DagreLayout } from '@antv/layout'
 export default {
   name: 'ProcessDetail',
-  props:['id'],
+  props:['executionId'],
   data(){
         return{
             graph: null,
@@ -28,16 +28,30 @@ export default {
                 ip:"127.0.0.1",
                 port:1234,
                 path:"/designDept"
-            }
+            },
+            proExecution:[]//拿到的流程
         }
     },
     mounted() {
+      this.getProExecutionsByExecutionId();//根据传入流程ID查找流程
       this.initGraph();
       this.nodeAddEvent();//启动节点可以进行点击并且删除
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
       this.myLayout();//启动布局
   },
   methods:{
+    /**
+     * 根据传入流程ID查找流程
+     * 
+     */
+    getProExecutionsByExecutionId()
+    {
+      api.getProExecutionsByExecutionId(this.executionId).then(res=>{
+        this.proExecution = res.data.valueMap.data;
+        console.log("传入成功getProExecutions:")
+        console.log(this.proExecution)
+      })
+    },
     goBack(){
       this.$router.go(-1);
     },

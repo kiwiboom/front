@@ -10,6 +10,8 @@
       </li>
       <li class="menu-item">
         <router-link to="/home/nodes">节点列表</router-link></li>
+        <li class="menu-item">
+          <router-link to="/home/orders">测试</router-link></li>
     </ul>
   </div>
 </template>

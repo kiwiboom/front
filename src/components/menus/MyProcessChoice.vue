@@ -1,23 +1,26 @@
 <template>
-  <div class="container" style="min-height: 100%; padding-bottom: 100px;">
-    <van-cell-group></van-cell-group>
-    <el-input
-      v-model="inputStartTime"
-      placeholder="请输入开始时间"
-      size="small"
-      class="input"
-    ></el-input>
-    <div div-lc-mark>
-      <el-input
-        v-model="inputEndTime"
-        placeholder="请输入终止时间"
-        size="small"
-        class="input"
-      ></el-input>
-    </div>
+    <div>
+      <el-form-item label="日期">
+                            <el-date-picker
+                                v-model="formData.start"
+                                type="datetime"
+                                placeholder="选择日期"
+                                value-format="YYYY-MM-DD HH:mm:ss"
+                                >
+                            </el-date-picker>
+                            -
+                            <el-date-picker
+                                v-model="formData.end"
+                                type="datetime"
+                                placeholder="选择日期"
+                                value-format="YYYY-MM-DD HH:mm:ss"
+                                >
+                            </el-date-picker>
+                
+      </el-form-item>
     <div div-lc-mark>
       <el-tag>状态选择</el-tag>
-      <el-radio-group v-model="radio">
+      <el-radio-group v-model="formData.radio">
         <el-radio :label="0">NotDone</el-radio>
         <el-radio :label="1">Done</el-radio>
       </el-radio-group>
@@ -40,7 +43,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(item,i) in processList" :key = 'item.id'>
+      <tr v-for="(item,i) in proExecutionList" :key = 'item.id'>
         <td>{{i+1}}</td>
         <td>{{item.id}}</td>
         <td>{{item.from}}</td>
@@ -68,12 +71,20 @@ import api from '/src/js/api.js'
     components: {},
     data() {
       return {
-        processList: [],//用来存储查询到的流程
-        inputEndTime:"",
-        inputStartTime: "",
-        radio: 0,//状态存储，radio=1代表done，=0代表notDone
-      }
-    },
+        proExecutionList: [],//用来存储查询到的流程
+        
+        page:{
+                pageNo: 1,//当前页
+                pageSize: 10,
+                totalCount: 0,//总条数
+              },
+        formData:{//日期时间
+                    start:'',
+                    end:'',
+                    radio: 0,//状态存储，radio=1代表done，=0代表notDone
+                  },
+              }
+          },
     watch: {},
     computed: {},
     beforeCreate() {},
@@ -85,22 +96,35 @@ import api from '/src/js/api.js'
     destroyed() {},
     methods: {
       request() {},
-      onQueryButtonClick() {
-        // console.log(this.inputStartTime)
-        api.queryExecution(this.radio,this.inputStartTime,this.inputEndTime).then(res =>{
-          console.log("radio状态="+this.radio)
-          console.log("开始时间="+this.inputStartTime)
-          console.log("终止时间="+this.inputEndTime)
+      onQueryButtonClick(){
+        api.queryExecution(this.formData.radio,this.formData.start,this.formData.end).then(res =>{
+          console.log("radio状态="+this.formData.radio)
+          console.log("开始时间"+this.formData.start)
+          console.log("end时间"+this.formData.end)
           console.log("res="+res)
-          this.processList = res.data.valueMap.data
-        })
+          console.log(res)
+          if(res.data.code == 200){
+            this.proExecutionList = res.data.valueMap.data
+              // this.page.totalCount = res.data.data.total_size//TODO分页
+          }
+          else{
+            console.log("错误")
+              this.$message({
+              type:'error',
+              message:res.data.msg
+              })
+                this.proExecutionList = []
+                this.page.totalCount = 0
+              }
+      })
         alert("请求查询成功")
-      },
+    },
       onEventClickLastPage() {},
       onEventClickNextPage() {},
     },
     fillter: {},
-  }
+}
+
 </script>
 
 <style scoped>

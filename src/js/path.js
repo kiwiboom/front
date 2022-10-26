@@ -3,6 +3,8 @@ const base = {
     getAllNodesByProcessId: "/process/query",
     getNodeByNodeId:"/node/query",
     queryExecution:"/execution/query",
+    getProExecutionsByExecutionId:"/execution/getProExecutionsByExecutionId",
+    getTasksByProExecutionId:"/execution/getTasksByProExecutionId",
 }
 
 export default base
