@@ -7,7 +7,7 @@ import ProcessChoice from './components/menus/MyProcessChoice.vue'
 import Orders from './components/menus/MyOrders.vue'
 import Settings from './components/menus/MySettings.vue'
 import NodeDetail from './components/nodes/MyNodeDetail.vue'
-
+import ProcessDetail from './components/process/MyProcessDetail.vue'
 const router = createRouter({
     history: createWebHashHistory(),
     routes:[
@@ -19,6 +19,7 @@ const router = createRouter({
            { path:'nodes',component:Nodes},
            { path:'flowcharts',component:Flowcharts},
            { path: 'processchoice', component: ProcessChoice },
+           { path: 'process/:id', component: ProcessDetail , props: true},
            { path: 'orders', component: Orders },
            { path: 'settings', component: Settings },
            { path: 'nodes/:id', component: NodeDetail , props: true},

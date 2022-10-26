@@ -18,8 +18,8 @@
     <div div-lc-mark>
       <el-tag>状态选择</el-tag>
       <el-radio-group v-model="radio">
-        <el-radio :label="3">Done</el-radio>
-        <el-radio :label="6">NotDone</el-radio>
+        <el-radio :label="0">NotDone</el-radio>
+        <el-radio :label="1">Done</el-radio>
       </el-radio-group>
       <div div-lc-mark></div>
     </div>
@@ -28,6 +28,30 @@
         >查询</el-button
       >
     </div>
+    <!-- 用户列表 -->
+  <table class="table table-bordered table-striped table-hover">
+    <thead>
+      <tr>
+        <th>顺序</th>
+        <th>执行记录id</th>
+        <th>执行记录开始时间</th>
+        <th>执行记录结束时间</th>
+        <th>是否完成</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item,i) in processList" :key = 'item.id'>
+        <td>{{i+1}}</td>
+        <td>{{item.id}}</td>
+        <td>{{item.from}}</td>
+        <td>{{item.to}}</td>
+        <td>{{item.done}}</td>
+        <td>
+          <router-link :to="'/home/process/' + item.id">查看详情</router-link>
+        </td>
+      </tr>
+    </tbody>
+  </table>
     <div div-lc-mark>
       <el-button-group>
         <el-button type="primary" @click="onEventClickLastPage">上一页</el-button>
@@ -38,14 +62,16 @@
 </template>
 
 <script>
+import api from '/src/js/api.js'
   export default {
     props: [],
     components: {},
     data() {
       return {
-        inputEndTime: "",
+        processList: [],//用来存储查询到的流程
+        inputEndTime:"",
         inputStartTime: "",
-        radio: 3,
+        radio: 0,//状态存储，radio=1代表done，=0代表notDone
       }
     },
     watch: {},
@@ -59,7 +85,17 @@
     destroyed() {},
     methods: {
       request() {},
-      onQueryButtonClick() {alert("请求查询成功")},
+      onQueryButtonClick() {
+        // console.log(this.inputStartTime)
+        api.queryExecution(this.radio,this.inputStartTime,this.inputEndTime).then(res =>{
+          console.log("radio状态="+this.radio)
+          console.log("开始时间="+this.inputStartTime)
+          console.log("终止时间="+this.inputEndTime)
+          console.log("res="+res)
+          this.processList = res.data.valueMap.data
+        })
+        alert("请求查询成功")
+      },
       onEventClickLastPage() {},
       onEventClickNextPage() {},
     },
