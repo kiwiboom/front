@@ -10,8 +10,10 @@
     "@antv/x6": "^1.34.2",
     "ant-design-vue": "^2.2.5",
     "axios": "^1.1.2",
+    "element-plus": "^2.2.19",
     "jquery": "^3.6.1",
     "querystring": "^0.2.1",
+    "vant": "^3.6.4",
     "vue": "^3.0.0-rc.1",
     "vue-router": "^4.0.3"
   },
@@ -19,6 +21,8 @@
     "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/compiler-sfc": "^3.0.0-rc.1",
     "less": "^3.12.2",
+    "node-sass": "^7.0.3",
+    "sass-loader": "^13.1.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4",
     "vite": "^1.0.0-rc.1"
