@@ -83,15 +83,32 @@ const dateApi ={
           //让每一个seq去和（seq-1）节点连线
           sequences_processnodes_map.forEach((sequencesNodes_ids,processNode_sequence)=>
         {
-            //连接上1个ProExeution的末尾
-            //找到parentProcessNode
-            // let parentProcessNode = tasks[0].processNode.process.parentProcessNode
+                            TODO
+            // //连接上1个ProExeution的末尾
+            // //找到last_Node,让本ProExeution的seq=1的所有节点去连接上一个ProExeution的末尾last_node
             // {
-            //  TODO
+            //   let last_processNodeId //TODO: 还没有给赋值
+            //   let last_proExecutionId //TODO: 还没有给赋值
+            //   let last_node_antvx6_id = last_proExecutionId+ '_' +last_processNodeId
+            //   let first_seq_node_ids = sequences_processnodes_map.get(1)//seq =1首层
+            //   first_seq_node_ids.forEach((target_node)=>
+            //   {
+            //     dataForNodesEdges.edges.push(
+            //       {
+            //           source: last_node_antvx6_id,
+            //           target: target_node,
+            //           attrs: {
+            //             line: {
+            //               stroke: '#fd6d6f',
+            //               strokeWidth: 1,
+            //             },
+            //           },
+            //       }
+            //   )
+            //   })
+            // }
 
-
-
-            //获得前一seq的nodes_ids
+            //获得相对前一seq的nodes_ids
             let last_node_ids = sequences_processnodes_map.get(processNode_sequence-1)
             if(last_node_ids==null)
             {
