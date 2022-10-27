@@ -13,7 +13,7 @@
 <script>
 import { Graph } from "@antv/x6";
 import api from '/src/js/api.js'
-import dateApi from '/src/js/getDateApi.js' 
+import dataApi from '/src/js/getDataApi.js' 
 import { DagreLayout } from '@antv/layout'
 export default {
   name: 'ProcessDetail',
@@ -37,12 +37,11 @@ export default {
         }
     },
     mounted() {
-      dateApi.getsometest();
-      this.initDate();//利用axios初始化流程
+      // this.initDate();//利用axios初始化流程
       this.initGraph();
       this.nodeAddEvent();//启动节点可以进行点击并且删除
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
-      this.myLayout();//启动布局
+      this.setLayout();//启动布局
   },
   methods:{
     /**
@@ -50,24 +49,11 @@ export default {
      * */
      async initDate()
     {
-      var proExecutions = [];//拿到的流程
-      proExecutions = await dateApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找流程
-      this.proExecutions = proExecutions;
-      // console.log(this.proExecutions);
-      var i;
-      var proExecutionsLength = proExecutions.length;
-      console.log("这是this.proExceutionsLength:"+proExecutionsLength)
-      var tasks = []
-      for(i=0;i<proExecutionsLength;i++)
-      {
-        proExecution = proExecutions[i];
-        tasks = getTasksByProExecutionId(proExecution.id)
-        console.log("当前是：第"+i+'的tasks')
-        console.log(tasks)
-        this.Tasks_List.push(tasks)
-      }
-      console.log("这是TasksList")
-      console.log(this.Tasks_List)
+      this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找流程
+      console.log('this is this.proExecutions')
+      console.log(this.proExecutions)
+      this.Tasks_List = await dataApi.getTasksListByByProExecutions(this.proExecutions);
+
     },
     goBack(){
       this.$router.go(-1);
@@ -226,7 +212,7 @@ export default {
     /**
      * 将图改成指定布局，并且读取axios刷新节点和边数据
      */
-    myLayout()
+    async setLayout()
     {
       const dagreLayout = new DagreLayout({
           type: 'dagre',
@@ -241,139 +227,147 @@ export default {
           edges: [],
         }
 
-        for (let i = 1; i <= 12; i++) {
-          data.nodes.push({
-            id: i + '',
-            shape: 'rect',
-            width: 60,
-            height: 30,
-            label: i,
-            attrs: {
-              body: {
-                fill: '#855af2',
-                stroke: 'transparent',
-              },
-              label: {
-                fill: '#ffffff',
-              },
-            },
-          })
-        }
+        // for (let i = 1; i <= 12; i++) {
+        //   data.nodes.push({
+        //     id: i + '',
+        //     shape: 'rect',
+        //     width: 60,
+        //     height: 30,
+        //     label: i,
+        //     attrs: {
+        //       body: {
+        //         fill: '#855af2',
+        //         stroke: 'transparent',
+        //       },
+        //       label: {
+        //         fill: '#ffffff',
+        //       },
+        //     },
+        //   })
+        // }
 
-        data.edges.push(
-          ...[
-            {
-              source: '1',
-              target: '2',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '2',
-              target: '3',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '2',
-              target: '4',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '5',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '6',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '7',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '8',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '5',
-              target: '9',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '6',
-              target: '10',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '7',
-              target: '11',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '8',
-              target: '12',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-          ],
-        )
+        // data.edges.push(
+        //   ...[
+        //     {
+        //       source: '1',
+        //       target: '2',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '2',
+        //       target: '3',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '2',
+        //       target: '4',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '4',
+        //       target: '5',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '4',
+        //       target: '6',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '4',
+        //       target: '7',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '4',
+        //       target: '8',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '5',
+        //       target: '9',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '6',
+        //       target: '10',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '7',
+        //       target: '11',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       source: '8',
+        //       target: '12',
+        //       attrs: {
+        //         line: {
+        //           stroke: '#fd6d6f',
+        //           strokeWidth: 1,
+        //         },
+        //       },
+        //     },
+        //   ],
+        // )
+
+      var tasks;
+      tasks  = await dataApi.getTasksByProExecutionId(189)
+      console.log("tasks: ")
+      console.log(tasks)
+      dataApi.addNodesEdgesByTasks(tasks,data)
+
+      // dataApi.getTasksListByByProExecutions()
       const newData = dagreLayout.layout(data)
       this.graph.fromJSON(newData)
     },
@@ -417,72 +411,6 @@ export default {
        * 初始化节点
       */
       initGraph() {
-          // 1. 节点 nodes 和边 edges 字段 的 JSON 数据
-          //默认节点和边数据
-          // const data = {
-          //     // 节点
-          //     nodes: [
-          //         {
-          //             id: "1", // String，可选，节点的唯一标识
-          //             x: 40, // Number，必选，节点位置的 x 值
-          //             y: 180, // Number，必选，节点位置的 y 值
-          //             width: 80, // Number，可选，节点大小的 width 值
-          //             height: 40, // Number，可选，节点大小的 height 值
-          //             attrs: {
-          //               body: {
-          //               fill: '#2ECC71',
-          //               stroke: '#000',
-          //               strokeDasharray: '10,2',
-          //               },
-          //               label: {
-          //               text: '潍柴设计部',
-          //               fill: '#333',
-          //               fontSize: 13,
-          //               },
-          //           }
-          //         },
-          //         {
-          //             id: "2", // String，节点的唯一标识
-          //             x: 160, // Number，必选，节点位置的 x 值
-          //             y: 180, // Number，必选，节点位置的 y 值
-          //             width: 80, // Number，可选，节点大小的 width 值
-          //             height: 40, // Number，可选，节点大小的 height 值
-          //             label: "潍柴零件供应商",// String，节点标
-          //         },
-          //         {
-          //             id: "3", // String，可选，节点的唯一标识
-          //             x: 320, // Number，必选，节点位置的 x 值
-          //             y: 100, // Number，必选，节点位置的 y 值
-          //             width: 80, // Number，可选，节点大小的 width 值
-          //             height: 40, // Number，可选，节点大小的 height 值
-          //             label: "潍柴主机厂" // String，节点标签
-          //         },
-          //         {
-          //             id: "4", // String，可选，节点的唯一标识
-          //             x: 320, // Number，必选，节点位置的 x 值
-          //             y: 300, // Number，必选，节点位置的 y 值
-          //             width: 80, // Number，可选，节点大小的 width 值
-          //             height: 40, // Number，可选，节点大小的 height 值
-          //             label: "潍柴实验相关部门" // String，节点标签
-          //         },
-          //     ],
-          //     // 边
-          //     edges: [
-          //         {
-          //             source: "1", // String，必须，起始节点 id
-          //             target: "2" // String，必须，目标节点 id
-          //         },
-          //         {
-          //             source: "2", // String，必须，起始节点 id
-          //             target: "3" // String，必须，目标节点 id
-          //         },
-          //         {
-          //             source: "2", // String，必须，起始节点 id
-          //             target: "4" // String，必须，目标节点 id
-          //         },
-          //     ]
-          // };
-         // 2. 渲染画布
           this.graph = new Graph({
             selecting: {
                 enabled: true,
@@ -503,10 +431,7 @@ export default {
             visible: true, // 渲染网格背景
           },
         });
-          // 3. 渲染我们的节点和边
-          // this.graph.fromJSON(data);
       },
-
 
   },
 }
