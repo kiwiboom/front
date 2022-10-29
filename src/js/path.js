@@ -5,6 +5,7 @@ const base = {
     queryExecution:"/execution/query",
     getProExecutionsByExecutionId:"/execution/getProExecutionsByExecutionId",
     getTasksByProExecutionId:"/execution/getTasksByProExecutionId",
+    getProExecutionByProExecutionId:"/proExecution/query",
 }
 
 export default base

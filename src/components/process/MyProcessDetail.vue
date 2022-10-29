@@ -37,9 +37,9 @@ export default {
         }
     },
     mounted() {
-      // this.initDate();//利用axios初始化流程
+      this.initDate();//利用axios初始化流程
       this.initGraph();
-      this.nodeAddEvent();//启动节点可以进行点击并且删除
+      this.nodeAddEvent();//使得节点可以进行点击并且删除
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
       this.setLayout();//启动布局
   },
@@ -49,11 +49,19 @@ export default {
      * */
      async initDate()
     {
-      this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找流程
+      this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找proExecutions
+
+      // var tasks  = await dataApi.getTasksByProExecutionId(189)
+      // console.log("tasks: ")
+      // console.log(tasks)
+      // dataApi.addNodesEdgesByTasks(tasks,data)
+
       console.log('this is this.proExecutions')
       console.log(this.proExecutions)
-      this.Tasks_List = await dataApi.getTasksListByByProExecutions(this.proExecutions);
-
+      
+      this.Tasks_List = await dataApi.getTasksListByProExecutions(this.proExecutions);//根据proExecutions拿到整个execution的Task_List
+      console.log('this is this.Tasks_List')
+      console.log(this.Tasks_List)
     },
     goBack(){
       this.$router.go(-1);

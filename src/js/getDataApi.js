@@ -5,14 +5,15 @@ const dateApi ={
          * @param executionId
          * @return Executions
          */
-    getProExecutionsByExecutionId(executionId)
+     async getProExecutionsByExecutionId(executionId)
     {
-        api.getProExecutionsByExecutionId(executionId).then(res=>{
-        console.log("传入成功getProExecutions:")
-        var proExecutions = res.data.valueMap.data
-        console.log(proExecutions)
-        return proExecutions;
+        let proExecutions;
+        await api.getProExecutionsByExecutionId(executionId).then(res=>{
+        // console.log("传入成功getProExecutions:")
+        // console.log(res.data.valueMap.data)
+        proExecutions = res.data.valueMap.data
         })
+        return proExecutions;
     },
     /**
      * 根据proExecutionId查找Tasks
@@ -29,13 +30,14 @@ const dateApi ={
         return tasks;
     },
     /**
-     * 根据传入的tasks将则一小段的tasks图像化为node和edge
+     * 根据传入某个proExecution的tasks将则一小段的tasks图像化为node和edge
      * 会根据tasks正确更新data中的nodes和edges
      * @param {传入的tasks} tasks 
+     * @param {tasks所属地proExecution} proExecution
      * @param {传入的data,包含了nodes和edges} dataForNodesEdges
      * @return {data} dataForNodesEdges 添加了新的nodes和edegs后的data
      */
-    addNodesEdgesByTasks(tasks,dataForNodesEdges)
+    addNodesEdgesByTasks(tasks,dataForNodesEdges,proExecution)
     {
         const sequences_processnodes_map = new Map();//
         //map:1->[node1的node_antvx6_id,node2的node_antvx6_id]
@@ -83,30 +85,29 @@ const dateApi ={
           //让每一个seq去和（seq-1）节点连线
           sequences_processnodes_map.forEach((sequencesNodes_ids,processNode_sequence)=>
         {
-                            TODO
-            // //连接上1个ProExeution的末尾
-            // //找到last_Node,让本ProExeution的seq=1的所有节点去连接上一个ProExeution的末尾last_node
-            // {
-            //   let last_processNodeId //TODO: 还没有给赋值
-            //   let last_proExecutionId //TODO: 还没有给赋值
-            //   let last_node_antvx6_id = last_proExecutionId+ '_' +last_processNodeId
-            //   let first_seq_node_ids = sequences_processnodes_map.get(1)//seq =1首层
-            //   first_seq_node_ids.forEach((target_node)=>
-            //   {
-            //     dataForNodesEdges.edges.push(
-            //       {
-            //           source: last_node_antvx6_id,
-            //           target: target_node,
-            //           attrs: {
-            //             line: {
-            //               stroke: '#fd6d6f',
-            //               strokeWidth: 1,
-            //             },
-            //           },
-            //       }
-            //   )
-            //   })
-            // }
+            //连接上1个ProExeution的末尾
+            //找到last_Node,让本ProExeution的seq=1的所有节点去连接上一个ProExeution的末尾last_node
+            {
+              let last_processNodeId = proExecution.lastProExecutionId
+              let last_proExecutionId = proExecution.lastProcessNodeId
+              let last_node_antvx6_id = last_proExecutionId+ '_' +last_processNodeId
+              let first_seq_node_ids = sequences_processnodes_map.get(1)//seq =1首层
+              first_seq_node_ids.forEach((target_node)=>
+              {
+                dataForNodesEdges.edges.push(
+                  {
+                      source: last_node_antvx6_id,
+                      target: target_node,
+                      attrs: {
+                        line: {
+                          stroke: '#fd6d6f',
+                          strokeWidth: 1,
+                        },
+                      },
+                  }
+              )
+              })
+            }
 
             //获得相对前一seq的nodes_ids
             let last_node_ids = sequences_processnodes_map.get(processNode_sequence-1)
@@ -142,29 +143,28 @@ const dateApi ={
         return dataForNodesEdges;
     },
     /**
-     * 根据一份execution中对应的多个ProExecutions,获取到每一个的ProExecution的tasks并存入TasksList
+     * 根据一份execution中对应的多个ProExecution组成的proExections,获取到每一个的ProExecution的tasks并存入TasksList
      * 通过execution获取到所有的tasks并构成tasksList
-     * @param
+     * @param {一份execution中对应的多个ProExecution组成的proExections} proExections
      */
-    getTasksListByExecutions(execution)
+    async getTasksListByProExecutions(proExecutions)
     {
         var i;
         var proExecutionsLength = proExecutions.length;
-        console.log("这是proExceutionsLength:"+proExecutionsLength)
         var temp_tasks = []
         var Tasks_List = [];
-        console.log('this is proExecutions')
-        console.log(proExecutions)
+        // console.log('this is proExecutions')
+        // console.log(proExecutions)
         for(i=0;i<proExecutionsLength;i++)
         {
-          proExecution = proExecutions[i];
-          temp_tasks = getTasksByProExecutionId(proExecution.id)
-          console.log("当前是：第"+i+'的tasks')
+          var proExecution = proExecutions[i];
+          var temp_tasks = await this.getTasksByProExecutionId(proExecution.id)
+          // console.log("当前是：第"+(i+1)+'个的tasks')
           console.log(temp_tasks)
           Tasks_List.push(temp_tasks)
         }
-        console.log("这是TasksList")
-        console.log(Tasks_List)
+        // console.log("这是TasksList")
+        // console.log(Tasks_List)
         return Tasks_List;
     }
 }

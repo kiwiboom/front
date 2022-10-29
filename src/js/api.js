@@ -13,14 +13,18 @@ const api = {
     {
        return axios.post(path.baseUrl +path.queryExecution,{isDone: isDone,startTime: startTime,endTime: endTime})
     },
-    async getProExecutionsByExecutionId(executionId)
+    getProExecutionsByExecutionId(executionId)
     {
-       return await axios.post(path.baseUrl +path.getProExecutionsByExecutionId,{executionId: executionId})
+       return axios.post(path.baseUrl +path.getProExecutionsByExecutionId,{executionId: executionId})
     },
     getTasksByProExecutionId(proExecutionId)
     {
        return axios.post(path.baseUrl +path.getTasksByProExecutionId,{proExecutionId: proExecutionId})
     },
+    getProExecutionByProExecutionId(proExecutionId)
+    {
+        return axios.post(path.baseUrl +path.getProExecutionByProExecutionId,{proExecutionId: proExecutionId})
+    }
 }
 
 export default api
