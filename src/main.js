@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import Vant from 'vant'
-// import '../node_modules/vant/lib/vant-css/index.css'
+import '../node_modules/vant/lib/index.css'
 // 导入 bootstrap 样式表
 import './assets/css/bootstrap.css'
 // 导入全局自定义样式表

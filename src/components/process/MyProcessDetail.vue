@@ -5,18 +5,52 @@
     </el-header>
     <el-container>
       <el-aside width="200px">
-        <div>选中的节点id：{{currentNode.id}}</div>
-        <div>选中的节点name:{{currentNode.name}}</div>
-        <div>选中的节点type：{{currentNode.type}}</div>
-        <div>选中的节点ip：{{currentNode.ip}}</div>
-        <div>选中的节点port：{{currentNode.port}}</div>
-        <div>选中的节点path：{{currentNode.path}}</div>
+
+
+        <el-card class="box-card">
+          <template #header>
+            <div class="clearfix">
+              <el-tag type="danger">当前运行到的节点</el-tag>
+                <!-- 这个是跳转查看所有节点按钮 -->
+                <!-- 有bug，还没有赋值ProcessId -->
+                <!-- <router-link :to="'/home/nodes'+ ProcessId">
+                  <el-button type="primary" round size="small"
+                  >查看该流程的所有节点信息</el-button>
+                </router-link> -->
+            </div>
+              <div>选中的节点id：{{cur_run_node.id}}</div>
+              <div>选中的节点name:{{cur_run_node.name}}</div>
+              <div>选中的节点type：{{cur_run_node.type}}</div>
+              <div>选中的节点ip：{{cur_run_node.ip}}</div>
+              <div>选中的节点port：{{cur_run_node.port}}</div>
+              <div>选中的节点path：{{cur_run_node.path}}</div>
+            </div>
+          </template>
+        </el-card>
+        <el-tag type="danger">选择下一节点</el-tag>
+        <el-radio-group v-model="next_node_choice">
+          <el-radio :label="3">备选项</el-radio>
+          <el-radio :label="6">备选项</el-radio>
+          <el-radio :label="9">备选项</el-radio>
+        </el-radio-group>
+
+        <el-button-group>
+          <el-button type="primary" @click="onGoBackNodeClick" size="small"
+            >返回上一节点</el-button
+          >
+          <el-button type="primary" @click="onGoNextNodeClick" size="small"
+            >进入下一节点</el-button
+          >
+        </el-button-group>
       </el-aside>
       <el-container>
         <el-main>
           <div id="container"></div>
         </el-main>
-        <el-footer>Footer</el-footer>
+        <el-footer>
+          <el-tag type="success">进度条</el-tag>
+          <van-progress :percentage="percentage"></van-progress>
+        </el-footer>
       </el-container>
     </el-container>
   </el-container>
@@ -41,13 +75,22 @@ export default {
   props:['executionId'],
   data(){
         return{
+            percentage: 10,//百分比index
             myAlert: {
               title:"成功提示",
               content:"成功查询",
               show: false,
             },
             graph: null,
-            currentNode:
+            cur_run_node:{//当前运行到的node
+                id: 1,
+                name: "潍柴设计部",
+                type:1,
+                ip:"127.0.0.1",
+                port:1234,
+                path:"/designDept"
+            },
+            cur_select_node://当前鼠标选定要查看信息的node
             {
                 id: 1,
                 name: "潍柴设计部",
@@ -91,8 +134,18 @@ export default {
      * */
     edgeAddEvent(){
       this.graph.on('edge:click', ({ e, x, y, edge, view }) => { 
-        
-        edge.attr('line/stroke', 'orange')
+        edge.appendLabel('edge')
+       edge.attr({
+          line: {
+            targetMarker: {
+              tagName: 'image',
+              'xlink:href': 'http://cdn3.iconfinder.com/data/icons/49handdrawing/24x24/left.png',
+              width: 24,
+              height: 24,
+              y: -12,
+            }
+          }
+        })
         edge.prop('labels/0', {
           attrs: {
             body: {
@@ -142,10 +195,10 @@ export default {
             //将最近选中的节点请求axios读取节点信息
             this.curSelectNode = node
             api.getNodeByNodeId(node.id).then(res =>{
-                this.currentNode = res.data.valueMap.data;
-                let alert_content = "id:" + this.currentNode.id +'\n' +'name:'+this.currentNode.name+"\n"
-                +"type:" + this.currentNode.type +'\n' +'ip:'+this.currentNode.ip +'\n' +'port:'+this.currentNode.port+'\n'
-                +"path:" + this.currentNode.path +'\n'
+                this.cur_select_node = res.data.valueMap.data;
+                let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
+                +"type:" + this.cur_select_node.type +'\n' +'ip:'+this.cur_select_node.ip +'\n' +'port:'+this.cur_select_node.port+'\n'
+                +"path:" + this.cur_select_node.path +'\n'
                 this.myAlertPop("查询到该节点信息",alert_content)
                 })
           } else {
@@ -177,12 +230,12 @@ export default {
           //将最近选中的节点请求axios读取节点信息
           this.curSelectNode = node
             api.getNodeByNodeId(node.id).then(res =>{
-                this.currentNode = res.data.valueMap.data;
-                let alert_content = "id:" + this.currentNode.id +'\n' +'name:'+this.currentNode.name+"\n"
-                +"type:" + this.currentNode.type +'\n' +'ip:'+this.currentNode.ip +'\n' +'port:'+this.currentNode.port+'\n'
-                +"path:" + this.currentNode.path +'\n'
+                this.cur_select_node = res.data.valueMap.data;
+                let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
+                +"type:" + this.cur_select_node.type +'\n' +'ip:'+this.cur_select_node.ip +'\n' +'port:'+this.cur_select_node.port+'\n'
+                +"path:" + this.cur_select_node.path +'\n'
                 this.myAlertPop("查询到该节点信息",alert_content)
-                console.log(this.currentNode)
+                console.log(this.cur_select_node)
                 })
         }
       })
@@ -418,20 +471,34 @@ export default {
       /**
        * 点击弹框事件
        * */
-       myAlertPop(title,content)
-        {
-          this.myAlert.title=title
-          this.myAlert.content=content
-          this.myAlert.show=true
-        },
-       hideModal() {
-          console.log("点击取消")
-          this.myAlert.show=false
-        },
-        submit() {
-          console.log("点击确认")
-          this.myAlert.show=false
-        },
+      myAlertPop(title,content)
+      {
+        this.myAlert.title=title
+        this.myAlert.content=content
+        this.myAlert.show=true
+      },
+      hideModal() {
+        console.log("点击取消")
+        this.myAlert.show=false
+      },
+      submit() {
+        console.log("点击确认")
+        this.myAlert.show=false
+      },
+      /**
+       * 按按钮返回上一节点
+       * */
+      onGoBackNodeClick()
+      {
+
+      },
+      /**
+       * 按按钮进入下一节点
+       * */
+      onGoNextNodeClick()
+      {
+
+      },
   }
 }
 </script>

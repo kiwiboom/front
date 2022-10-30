@@ -5,7 +5,6 @@ import Nodes from './components/menus/MyNodes.vue'
 import Flowcharts from './components/menus/MyFlowcharts.vue'
 import ProcessChoice from './components/menus/MyProcessChoice.vue'
 import Orders from './components/menus/MyOrders.vue'
-import Settings from './components/menus/MySettings.vue'
 import NodeDetail from './components/nodes/MyNodeDetail.vue'
 import ProcessDetail from './components/process/MyProcessDetail.vue'
 const router = createRouter({
@@ -21,7 +20,6 @@ const router = createRouter({
            { path: 'processchoice', component: ProcessChoice },
            { path: 'process/:executionId', component: ProcessDetail , props: true},
            { path: 'orders', component: Orders },
-           { path: 'settings', component: Settings },
            { path: 'nodes/:id', component: NodeDetail , props: true},
          ]
         },

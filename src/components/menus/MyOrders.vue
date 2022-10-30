@@ -28,7 +28,9 @@ export default {
           console.log("点击确认")
           this.myAlert.show=false
         },
-
+        test(){
+          
+        }
     }
 }
 </script>

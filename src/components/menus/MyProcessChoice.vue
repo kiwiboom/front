@@ -52,6 +52,7 @@
         <td>{{item.done}}</td>
         <td>
           <router-link :to="'/home/process/' + item.id">查看详情</router-link>
+          <van-icon class="icon-c" name="chat-o" size="1.5rem"></van-icon>
         </td>
       </tr>
     </tbody>
