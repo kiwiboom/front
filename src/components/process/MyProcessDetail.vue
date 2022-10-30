@@ -28,10 +28,9 @@
           </template>
         </el-card>
         <el-tag type="danger">选择下一节点</el-tag>
-        <el-radio-group v-model="next_node_choice">
-          <el-radio :label="3">备选项</el-radio>
-          <el-radio :label="6">备选项</el-radio>
-          <el-radio :label="9">备选项</el-radio>
+
+        <el-radio-group v-model="next_node_choice_id">
+          <el-radio v-for='(item,index) in next_node_choices' :label="item.id">{{item.label}}</el-radio>
         </el-radio-group>
 
         <el-button-group>
@@ -75,6 +74,25 @@ export default {
   props:['executionId'],
   data(){
         return{
+              data_with_nodes_edges : {
+              nodes: [],
+              edges: [],
+            },
+            next_node_choice_id : 0,
+            next_node_choices:[
+              {
+                id: 1 + '',
+                label: "研发部1",
+              },
+              {
+                id: 2 + '',
+                label: "研发部2",
+              },
+              {
+                id: 3 + '',
+                label: "研发部3",
+              },
+            ],
             percentage: 10,//百分比index
             myAlert: {
               title:"成功提示",
@@ -83,6 +101,7 @@ export default {
             },
             graph: null,
             cur_run_node:{//当前运行到的node
+                node_antvx6_id: 1,
                 id: 1,
                 name: "潍柴设计部",
                 type:1,
@@ -112,6 +131,9 @@ export default {
       this.edgeAddEvent();//使得边可以进行点击与交互显示
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
       this.setLayout();//启动布局
+                      //更新当前运行节点
+                      //更新当前可选择的下一节点
+
   },
   methods:{
     /**
@@ -253,10 +275,6 @@ export default {
           nodesep: 15,
           controlPoints: true,
         })
-        const data_with_nodes_edges = {
-          nodes: [],
-          edges: [],
-        }
         //想要画出多个proExctions，但是有bug
       // Tasks_List.forEach(tasks => {
       //  dataApi.addNodesEdgesByTasks(tasks,data_with_nodes_edges)
@@ -273,7 +291,7 @@ export default {
 
       //测试用
       for (let i = 1; i <= 12; i++) {
-        data_with_nodes_edges.nodes.push({
+        this.data_with_nodes_edges.nodes.push({
             id: i + '',
             shape: 'rect',
             width: 60,
@@ -290,7 +308,7 @@ export default {
             },
           })
         }
-        data_with_nodes_edges.edges.push(
+        this.data_with_nodes_edges.edges.push(
           ...[
             {
               source: '1',
@@ -404,7 +422,7 @@ export default {
             },
           ],
         )
-      const newData = dagreLayout.layout(data_with_nodes_edges)
+      const newData = dagreLayout.layout(this.data_with_nodes_edges)
       this.graph.fromJSON(newData)
     },
 
@@ -498,6 +516,27 @@ export default {
       onGoNextNodeClick()
       {
 
+      },
+      /**
+       * 更新下一节点选项
+       * */
+      update_next_node_choices(){
+        sourceNode_id = cur_run_node.node_antvx6_id
+        this.data_with_nodes_edges.array.forEach(edge => {
+          if(edge.source == sourceNode_id)
+          {
+            next_node_choice_id = edge.target
+            data_with_nodes_edges.forEach(node=>  {
+              if(node.id == next_node_choice_id)
+              {
+                next_node_choice={
+                  id: node.id,
+                  label: node.label
+                }
+              }
+            })
+          }
+        });
       },
   }
 }
