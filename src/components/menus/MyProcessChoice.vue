@@ -8,7 +8,7 @@
                                 value-format="YYYY-MM-DD HH:mm:ss"
                                 >
                             </el-date-picker>
-                            -
+                            至
                             <el-date-picker
                                 v-model="formData.end"
                                 type="datetime"
@@ -40,6 +40,7 @@
         <th>执行记录开始时间</th>
         <th>执行记录结束时间</th>
         <th>是否完成</th>
+        <th>操作</th>
       </tr>
     </thead>
     <tbody>
@@ -55,22 +56,41 @@
       </tr>
     </tbody>
   </table>
-    <div div-lc-mark>
+    <div div-lc-mark id="clickLastOrNextPage">
       <el-button-group>
         <el-button type="primary" @click="onEventClickLastPage">上一页</el-button>
         <el-button type="primary" @click="onEventClickNextPage">下一页</el-button>
       </el-button-group>
     </div>
   </div>
+
+  <el-steps :active="active" finish-status="success" id="steps">
+      <el-step title="请查询"></el-step>
+      <el-step title="请点进具体流程"></el-step>
+    </el-steps>
+
+  <!-- （隐藏的）alert样式 -->
+  <div>
+    <my-alert :title="myAlert.title" :show="myAlert.show" :content="myAlert.content" @submit="submit" @hideModal="hideModal"></my-alert>
+  </div>
 </template>
 
 <script>
 import api from '/src/js/api.js'
+import MyAlert from "../utils/MyAlert.vue"
   export default {
     props: [],
-    components: {},
+    components: {
+      'my-alert':MyAlert,
+    },
     data() {
       return {
+        active: 0,//初始化当前的步骤index=0
+        myAlert: {
+              title:"提示",
+              content:"内容",
+              show: false,
+            },//出现提示用的
         proExecutionList: [],//用来存储查询到的流程
         
         page:{
@@ -95,7 +115,21 @@ import api from '/src/js/api.js'
     updated() {},
     destroyed() {},
     methods: {
-      request() {},
+      //点击弹窗的方法
+        myAlertPop(title,content)
+        {
+          this.myAlert.title=title
+          this.myAlert.content=content
+          this.myAlert.show=true
+        },
+        hideModal() {
+          console.log("点击取消")
+          this.myAlert.show=false
+        },
+        submit() {
+          console.log("点击确认")
+          this.myAlert.show=false
+        },
       onQueryButtonClick(){
         api.queryExecution(this.formData.radio,this.formData.start,this.formData.end).then(res =>{
           console.log("radio状态="+this.formData.radio)
@@ -117,7 +151,8 @@ import api from '/src/js/api.js'
                 this.page.totalCount = 0
               }
       })
-        alert("请求查询成功")
+        this.myAlertPop("提示","流程成功查询")
+        this.active=1;//步骤条=1
     },
       onEventClickLastPage() {},
       onEventClickNextPage() {},
@@ -128,6 +163,14 @@ import api from '/src/js/api.js'
 </script>
 
 <style scoped>
-  .input{}
-  .container {  }
+    #clickLastOrNextPage{
+      position:absolute;
+      bottom:100px; 
+      right:50%;
+    }
+    #steps{
+      position:absolute;
+      bottom:0;
+      width:75%;
+    }
 </style>

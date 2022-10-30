@@ -1,5 +1,19 @@
 import api from './api'
 const dateApi ={
+  /**
+   * 根据Id获取
+   * @param {Id} proExecutionId 
+   */
+    async  getProExecutionByProExecutionId(proExecutionId)
+    {
+        let proExecution
+        await api,getProExecutionByProExecutionId(proExecutionId).then(
+          res => {
+            proExecution = res.data.valueMap.data
+          }
+        )
+        return proExecution
+    },
     /**
          * 根据传入流程ID查找流程
          * @param executionId
@@ -33,7 +47,7 @@ const dateApi ={
      * 根据传入某个proExecution的tasks将则一小段的tasks图像化为node和edge
      * 会根据tasks正确更新data中的nodes和edges
      * @param {传入的tasks} tasks 
-     * @param {tasks所属地proExecution} proExecution
+     * @param {tasks所属的proExecution} proExecution
      * @param {传入的data,包含了nodes和edges} dataForNodesEdges
      * @return {data} dataForNodesEdges 添加了新的nodes和edegs后的data
      */

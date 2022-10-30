@@ -1,6 +1,8 @@
 <template>
-  <h4 class="text-center">测试</h4>
-
+  <!-- （隐藏的）alert样式 -->
+  <div>
+    <my-alert :title="myAlert.title" :show="myAlert.show" :content="myAlert.content" @submit="submit" @hideModal="hideModal"></my-alert>
+  </div>
 </template>
 
 <script>
@@ -28,7 +30,14 @@ export default {
           console.log("点击确认")
           this.myAlert.show=false
         },
-
+        myAlertPop(title,content)
+        {
+          this.myAlert.title=title
+          this.myAlert.content=content
+          this.myAlert.show=true
+        },
+        // this.myAlertPop("提示","流程成功查询")
+        // this.active=1;//步骤条=1
     }
 }
 </script>

@@ -6,6 +6,7 @@
   <div>选中的节点ip：{{currentNode.ip}}</div>
   <div>选中的节点port：{{currentNode.port}}</div>
   <div>选中的节点path：{{currentNode.path}}</div>
+  
 </template>
 <script >
 import { Graph } from "@antv/x6";
@@ -169,7 +170,7 @@ export default {
         if (this.curSelectNode) {
           // 移除选中状态
           this.curSelectNode.removeTools()
-          // 判断两次选中节点是否相同
+          // 判断两次选中节点如果不相同，则换一个curSelect
           if (this.curSelectNode !== node) {
             node.addTools([{
               name: 'boundary',
@@ -192,15 +193,19 @@ export default {
                 }
               }
             }])
+            console.log()
+            alert(node)
             //将最近选中的节点请求axios读取节点信息
             this.curSelectNode = node
             api.getNodeByNodeId(node.id).then(res =>{
                 this.currentNode = res.data.valueMap.data;
                 })
-          } else {
+          } 
+          else {
             this.curSelectNode = null
           }
-        } else {
+        } 
+        else {
           this.curSelectNode = node
           node.addTools([{
             name: 'boundary',
