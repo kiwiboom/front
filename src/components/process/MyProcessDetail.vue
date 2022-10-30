@@ -1,13 +1,25 @@
 <template>
-  <button type="button" class="btn btn-light btn-sm" @click="goBack">后退</button>
-  <h4 class="text-center">流程详情 --- {{executionId}}</h4>
-  <div id="container"></div>
-  <div>选中的节点id：{{currentNode.id}}</div>
-  <div>选中的节点name:{{currentNode.name}}</div>
-  <div>选中的节点type：{{currentNode.type}}</div>
-  <div>选中的节点ip：{{currentNode.ip}}</div>
-  <div>选中的节点port：{{currentNode.port}}</div>
-  <div>选中的节点path：{{currentNode.path}}</div>
+  <el-container>
+    <el-header>
+      <el-page-header @back="goBack" content="流程详情"></el-page-header>
+    </el-header>
+    <el-container>
+      <el-aside width="200px">
+        <div>选中的节点id：{{currentNode.id}}</div>
+        <div>选中的节点name:{{currentNode.name}}</div>
+        <div>选中的节点type：{{currentNode.type}}</div>
+        <div>选中的节点ip：{{currentNode.ip}}</div>
+        <div>选中的节点port：{{currentNode.port}}</div>
+        <div>选中的节点path：{{currentNode.path}}</div>
+      </el-aside>
+      <el-container>
+        <el-main>
+          <div id="container"></div>
+        </el-main>
+        <el-footer>Footer</el-footer>
+      </el-container>
+    </el-container>
+  </el-container>
 
     <!-- （隐藏的）alert样式 -->
     <div>
@@ -54,6 +66,7 @@ export default {
       this.initDate();//利用axios初始化流程
       this.initGraph();
       this.nodeAddEvent();//使得节点可以进行点击并且删除
+      this.edgeAddEvent();//使得边可以进行点击与交互显示
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
       this.setLayout();//启动布局
   },
@@ -74,9 +87,26 @@ export default {
       this.$router.go(-1);
     },
     /**
+     * 让图里面所有的边绑定点击事件
+     * */
+    edgeAddEvent(){
+      this.graph.on('edge:click', ({ e, x, y, edge, view }) => { 
+        
+        edge.attr('line/stroke', 'orange')
+        edge.prop('labels/0', {
+          attrs: {
+            body: {
+              stroke: 'orange',
+            },
+          },
+        })
+      })
+    },
+    /**
        * 让图里面所有的节点绑定点击事件
        */
     nodeAddEvent() {
+      
       // 节点绑定点击事件
       this.graph.on('node:click', ({ e, x, y, node, view }) => {
         //读取nodeid
