@@ -18,6 +18,7 @@
                   >查看该流程的所有节点信息</el-button>
                 </router-link> -->
             </div>
+            <div>
               <div>选中的节点id：{{cur_run_node.id}}</div>
               <div>选中的节点name:{{cur_run_node.name}}</div>
               <div>选中的节点type：{{cur_run_node.type}}</div>
@@ -30,7 +31,7 @@
         <el-tag type="danger">选择下一节点</el-tag>
 
         <el-radio-group v-model="next_node_choice_id">
-          <el-radio v-for='(item,index) in next_node_choices' :label="item.id">{{item.label}}</el-radio>
+          <el-radio v-for='(item,index) in next_node_choices' :label="item.node_antvx6_id">{{item.label}}</el-radio>
         </el-radio-group>
 
         <el-button-group>
@@ -47,7 +48,7 @@
           <div id="container"></div>
         </el-main>
         <el-footer>
-          <el-tag type="success">进度条</el-tag>
+          <el-tag type="success">当前流程进度条</el-tag>
           <van-progress :percentage="percentage"></van-progress>
         </el-footer>
       </el-container>
@@ -74,23 +75,16 @@ export default {
   props:['executionId'],
   data(){
         return{
-              data_with_nodes_edges : {
-              nodes: [],
-              edges: [],
+              data_with_nodes_edges : 
+              {
+                    nodes: [],
+                    edges: [],
             },
-            next_node_choice_id : 0,
+            next_node_choice_id : 0,//默认为空（格式如212_)
             next_node_choices:[
               {
-                id: 1 + '',
+                node_antvx6_id: "212_1",
                 label: "研发部1",
-              },
-              {
-                id: 2 + '',
-                label: "研发部2",
-              },
-              {
-                id: 3 + '',
-                label: "研发部3",
               },
             ],
             percentage: 10,//百分比index
@@ -101,7 +95,7 @@ export default {
             },
             graph: null,
             cur_run_node:{//当前运行到的node
-                node_antvx6_id: 1,
+                node_antvx6_id: "212_1",
                 id: 1,
                 name: "潍柴设计部",
                 type:1,
@@ -125,28 +119,34 @@ export default {
         }
     },
     mounted() {
-      this.initDate();//利用axios初始化流程
+      this.init()//启动函数
+
+
+
+  },
+  methods:{
+    async init(){
       this.initGraph();
       this.nodeAddEvent();//使得节点可以进行点击并且删除
       this.edgeAddEvent();//使得边可以进行点击与交互显示
       this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
-      this.setLayout();//启动布局
+      await this.setLayout();//设置图的布局，将node和edges更新在图上
+      this.update_next_node_choices()//首次更新当前可选择的下一节点
                       //更新当前运行节点
-                      //更新当前可选择的下一节点
 
-  },
-  methods:{
+    },
     /**
-     *  利用axios初始化流程
+     *  利用axios初始化流程,更新proExecutions，Tasks_List
      * */
      async initDate()
     {
-      this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找proExecutions
+      this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找proExecution
       console.log('this is this.proExecutions')
       console.log(this.proExecutions)
       this.Tasks_List = await dataApi.getTasksListByProExecutions(this.proExecutions);//根据proExecutions拿到整个execution的Task_List
       console.log('this is this.Tasks_List')
       console.log(this.Tasks_List)
+
     },
     goBack(){
       this.$router.go(-1);
@@ -156,7 +156,7 @@ export default {
      * */
     edgeAddEvent(){
       this.graph.on('edge:click', ({ e, x, y, edge, view }) => { 
-        edge.appendLabel('edge')
+       edge.appendLabel('edge')
        edge.attr({
           line: {
             targetMarker: {
@@ -275,153 +275,16 @@ export default {
           nodesep: 15,
           controlPoints: true,
         })
-        //想要画出多个proExctions，但是有bug
-      // Tasks_List.forEach(tasks => {
-      //  dataApi.addNodesEdgesByTasks(tasks,data_with_nodes_edges)
-      // });
 
-      // 可以用没有bug
-      // tasks  = await dataApi.getTasksByProExecutionId(189)
-      // console.log("tasks: ")
-      //  console.log(tasks)
-      // dataApi.addNodesEdgesByTasks(tasks,data_with_nodes_edges)
-
-      // dataApi.getTasksListByByProExecutions()
-
-
-      //测试用
-      for (let i = 1; i <= 12; i++) {
-        this.data_with_nodes_edges.nodes.push({
-            id: i + '',
-            shape: 'rect',
-            width: 60,
-            height: 30,
-            label: i,
-            attrs: {
-              body: {
-                fill: '#855af2',
-                stroke: 'transparent',
-              },
-              label: {
-                fill: '#ffffff',
-              },
-            },
-          })
-        }
-        this.data_with_nodes_edges.edges.push(
-          ...[
-            {
-              source: '1',
-              target: '2',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '2',
-              target: '3',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '2',
-              target: '4',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '5',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '6',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '7',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '4',
-              target: '8',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '5',
-              target: '9',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '6',
-              target: '10',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '7',
-              target: '11',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-            {
-              source: '8',
-              target: '12',
-              attrs: {
-                line: {
-                  stroke: '#fd6d6f',
-                  strokeWidth: 1,
-                },
-              },
-            },
-          ],
-        )
+      
+      await this.initDate()//获取数据proExecutions和Tasks_List
+      //将所有tasks的添加进入图里面,一份proExection对应一份tasks
+      for(let i = 0; i < this.Tasks_List.length;i++)
+      {
+        let tasks = this.Tasks_List[i]
+        let proExecution = this.proExecutions[i]
+        this.data_with_nodes_edges = await dataApi.addNodesEdgesByTasks(tasks,this.data_with_nodes_edges,proExecution)
+      }
       const newData = dagreLayout.layout(this.data_with_nodes_edges)
       this.graph.fromJSON(newData)
     },
@@ -515,28 +378,51 @@ export default {
        * */
       onGoNextNodeClick()
       {
-
+        //传过来的这个next_node_choice_id是proExecutionId_processNodeId
+        //对其进行proExecutionId和processNodeId拿到nodeId信息
+        let proExecutionId = this.next_node_choice_id.split('_')[0]
+        let processNodeId = this.next_node_choice_id.split('_')[1]
+        TODO
+        TODO
+        TODO
+        TODO
+        TODO
+        TODO
+        TODO
+        //TODO: 对其进行proExecutionId和processNodeId拿到nodeId信息
+        console.log()
+        this.update_cur_run_node()
       },
-      /**
-       * 更新下一节点选项
+       /**
+       * 更新单选框中下一节点选项
        * */
-      update_next_node_choices(){
-        sourceNode_id = cur_run_node.node_antvx6_id
-        this.data_with_nodes_edges.array.forEach(edge => {
+       update_next_node_choices(){
+        this.next_node_choices = []
+        let sourceNode_id = this.cur_run_node.node_antvx6_id
+        let edges = this.data_with_nodes_edges.edges
+        let nodes = this.data_with_nodes_edges.nodes
+        edges.forEach(edge => {
           if(edge.source == sourceNode_id)
           {
-            next_node_choice_id = edge.target
-            data_with_nodes_edges.forEach(node=>  {
+            let next_node_choice_id = edge.target
+            nodes.forEach(node=>  {
               if(node.id == next_node_choice_id)
               {
-                next_node_choice={
-                  id: node.id,
+                let next_node_choice={
+                  node_antvx6_id: node.id,
                   label: node.label
                 }
+                this.next_node_choices.push(next_node_choice)
               }
             })
           }
         });
+      },
+      /**
+       * 更新当前运行节点,根据输入进来的nodeId改变cur_run_node
+       * */
+       async update_cur_run_node(new_cur_node_id){
+        this.cur_run_node = await dataApi.getNodeByNodeId(new_cur_node_id)
       },
   }
 }

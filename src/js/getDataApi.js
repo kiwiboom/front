@@ -1,5 +1,19 @@
 import api from './api'
 const dateApi ={
+    /**
+   * 根据Id获取
+   * @param {Id} nodeId
+   */
+     async  getNodeByNodeId(nodeId)
+     {
+         let node
+         await api.getNodeByNodeId(nodeId).then(
+           res => {
+            node = res.data.valueMap.data
+           }
+         )
+         return node
+     },
   /**
    * 根据Id获取
    * @param {Id} proExecutionId 
@@ -7,7 +21,7 @@ const dateApi ={
     async  getProExecutionByProExecutionId(proExecutionId)
     {
         let proExecution
-        await api,getProExecutionByProExecutionId(proExecutionId).then(
+        await api.getProExecutionByProExecutionId(proExecutionId).then(
           res => {
             proExecution = res.data.valueMap.data
           }
@@ -94,35 +108,38 @@ const dateApi ={
               },
             })
         }
-          // console.log(sequences_processnodes_map)
+
           //先让本ProExeution的第一Seq节点去找到parentProcessNode，连接上1个ProExeution的末尾
+        //连接上1个ProExeution的末尾
+        //找到last_Node,让本ProExeution的seq=1的所有节点去连接上一个ProExeution的末尾last_node
+        {
+          let last_processNodeId = proExecution.lastProcessNodeId
+          let last_proExecutionId = proExecution.lastProExecutionId
+          let last_node_antvx6_id = last_proExecutionId+ '_' +last_processNodeId
+          if(last_node_antvx6_id !== '0_0')//如果前一个存在
+          {
+            let firstSeq_node_ids = sequences_processnodes_map.get(1)//seq =1首层
+            firstSeq_node_ids.forEach((target_node)=>
+            {
+              dataForNodesEdges.edges.push(
+                {
+                    source: last_node_antvx6_id,
+                    target: target_node,
+                    attrs: {
+                      line: {
+                        stroke: '#fd6d6f',
+                        strokeWidth: 1,
+                      },
+                    },
+                }
+            )
+            })
+          }
+        }
+
           //让每一个seq去和（seq-1）节点连线
           sequences_processnodes_map.forEach((sequencesNodes_ids,processNode_sequence)=>
         {
-            //连接上1个ProExeution的末尾
-            //找到last_Node,让本ProExeution的seq=1的所有节点去连接上一个ProExeution的末尾last_node
-            {
-              let last_processNodeId = proExecution.lastProExecutionId
-              let last_proExecutionId = proExecution.lastProcessNodeId
-              let last_node_antvx6_id = last_proExecutionId+ '_' +last_processNodeId
-              let first_seq_node_ids = sequences_processnodes_map.get(1)//seq =1首层
-              first_seq_node_ids.forEach((target_node)=>
-              {
-                dataForNodesEdges.edges.push(
-                  {
-                      source: last_node_antvx6_id,
-                      target: target_node,
-                      attrs: {
-                        line: {
-                          stroke: '#fd6d6f',
-                          strokeWidth: 1,
-                        },
-                      },
-                  }
-              )
-              })
-            }
-
             //获得相对前一seq的nodes_ids
             let last_node_ids = sequences_processnodes_map.get(processNode_sequence-1)
             if(last_node_ids==null)
@@ -174,7 +191,7 @@ const dateApi ={
           var proExecution = proExecutions[i];
           var temp_tasks = await this.getTasksByProExecutionId(proExecution.id)
           // console.log("当前是：第"+(i+1)+'个的tasks')
-          console.log(temp_tasks)
+          // console.log(temp_tasks)
           Tasks_List.push(temp_tasks)
         }
         // console.log("这是TasksList")

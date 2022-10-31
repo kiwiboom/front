@@ -138,7 +138,7 @@ import MyAlert from "../utils/MyAlert.vue"
           console.log("end时间"+this.formData.end)
           console.log("res="+res)
           console.log(res)
-          if(res.data.code == 200){
+          if(res.data.code == 0){//这里的数据库认为code=0成功
             this.proExecutionList = res.data.valueMap.data
               // this.page.totalCount = res.data.data.total_size//TODO分页
           }
