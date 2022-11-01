@@ -2,9 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import Login from './components/MyLogin.vue'
 import Home from './components/MyHome.vue'
 import Nodes from './components/menus/MyNodes.vue'
-import Flowcharts from './components/menus/MyFlowcharts.vue'
 import ProcessChoice from './components/menus/MyProcessChoice.vue'
-import Orders from './components/menus/MyOrders.vue'
 import NodeDetail from './components/nodes/MyNodeDetail.vue'
 import ProcessDetail from './components/process/MyProcessDetail.vue'
 const router = createRouter({
@@ -16,10 +14,8 @@ const router = createRouter({
          redirect:'/home/nodes',
          children:[
            { path:'nodes',component:Nodes},
-           { path:'flowcharts',component:Flowcharts},
            { path: 'processchoice', component: ProcessChoice },
            { path: 'process/:executionId', component: ProcessDetail , props: true},
-           { path: 'orders', component: Orders },
            { path: 'nodes/:id', component: NodeDetail , props: true},
          ]
         },
