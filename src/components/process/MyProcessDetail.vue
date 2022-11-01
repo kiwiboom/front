@@ -11,12 +11,6 @@
           <template #header>
             <div class="clearfix">
               <el-tag type="danger">当前运行到的节点</el-tag>
-                <!-- 这个是跳转查看所有节点按钮 -->
-                <!-- 有bug，还没有赋值ProcessId -->
-                <!-- <router-link :to="'/home/nodes'+ ProcessId">
-                  <el-button type="primary" round size="small"
-                  >查看该流程的所有节点信息</el-button>
-                </router-link> -->
             </div>
             <div>
               <div>选中的节点id：{{cur_run_node.id}}</div>
@@ -27,11 +21,17 @@
               <div>选中的节点path：{{cur_run_node.path}}</div>
             </div>
           </template>
+            <!-- 这个是跳转查看所有节点按钮 -->
+            <!-- 有bug，还没有赋值ProcessId -->
+             <router-link :to="'/home/nodes'+ ProcessId">
+              <el-button type="primary" round size="small"
+              >查看该流程的所有节点信息</el-button>
+            </router-link>
         </el-card>
         <el-tag type="danger">选择下一节点</el-tag>
 
         <el-radio-group v-model="next_node_choice_id">
-          <el-radio v-for='(item,index) in next_node_choices' :label="item.node_antvx6_id">{{item.label}}</el-radio>
+          <el-radio v-for='(item,index) in next_node_choices' :key="index" :label="item.node_antvx6_id" >{{item.label}}</el-radio>
         </el-radio-group>
 
         <el-button-group>
@@ -45,6 +45,7 @@
       </el-aside>
       <el-container>
         <el-main>
+          <el-tag type="success">当前流程图</el-tag>
           <div id="container"></div>
         </el-main>
         <el-footer>
@@ -75,42 +76,42 @@ export default {
   props:['executionId'],
   data(){
         return{
-              data_with_nodes_edges : 
-              {
+            data_with_nodes_edges : 
+            {
                     nodes: [],
                     edges: [],
-            },
-            next_node_choice_id : 0,//默认为空（格式如212_)
+            },//json形式的nodes和edges
+            next_node_choice_id : "0",//默认为空（格式如212_1)
             next_node_choices:[
               {
-                node_antvx6_id: "212_1",
-                label: "研发部1",
+                // node_antvx6_id: "212_1",
+                // label: "研发部1",
               },
             ],
-            percentage: 10,//百分比index
+            percentage: 0,//百分比index
             myAlert: {
-              title:"成功提示",
-              content:"成功查询",
-              show: false,
+              // title:"成功提示",
+              // content:"成功查询",
+              // show: false,
             },
             graph: null,
             cur_run_node:{//当前运行到的node
-                node_antvx6_id: "212_1",
-                id: 1,
-                name: "潍柴设计部",
-                type:1,
-                ip:"127.0.0.1",
-                port:1234,
-                path:"/designDept"
+                // node_antvx6_id: "212_1",
+                // id: 1,
+                // name: "潍柴设计部",
+                // type:1,
+                // ip:"127.0.0.1",
+                // port:1234,
+                // path:"/designDept"
             },
             cur_select_node://当前鼠标选定要查看信息的node
             {
-                id: 1,
-                name: "潍柴设计部",
-                type:1,
-                ip:"127.0.0.1",
-                port:1234,
-                path:"/designDept"
+                // id: 1,
+                // name: "潍柴设计部",
+                // type:1,
+                // ip:"127.0.0.1",
+                // port:1234,
+                // path:"/designDept"
             },
             //一个executionId-》多个proExecutions
             // 一个proExecution-》多个tasks
@@ -129,11 +130,18 @@ export default {
       this.initGraph();
       this.nodeAddEvent();//使得节点可以进行点击并且删除
       this.edgeAddEvent();//使得边可以进行点击与交互显示
-      this.currentNodeFlashing(40,180);//启动选中将给定节点闪烁
-      await this.setLayout();//设置图的布局，将node和edges更新在图上
-      this.update_next_node_choices()//首次更新当前可选择的下一节点
-                      //更新当前运行节点
-
+      await this.setLayout();//设置图的布局，将node和edges更新在图上,更新this.cur_run_node
+      this.update_cur_run_node(this.cur_run_node) //首次更新当前运行节点，并且在图上渲染出来当前节点
+      this.update_next_node_choices(this.cur_run_node)//首次更新当前可选择的下一节点
+      this.update_percentage()//首次更新进度条
+    },
+    /**
+     * 更新流程进度条
+     * 暂时没做具体的,这肯定有问题
+     */
+    update_percentage(){
+      //TODO: 暂时不做
+      this.percentage += 10;
     },
     /**
      *  利用axios初始化流程,更新proExecutions，Tasks_List
@@ -141,11 +149,11 @@ export default {
      async initDate()
     {
       this.proExecutions = await dataApi.getProExecutionsByExecutionId(this.executionId);//根据传入流程ID查找proExecution
-      console.log('this is this.proExecutions')
-      console.log(this.proExecutions)
+      // console.log('this is this.proExecutions')
+      // console.log(this.proExecutions)
       this.Tasks_List = await dataApi.getTasksListByProExecutions(this.proExecutions);//根据proExecutions拿到整个execution的Task_List
-      console.log('this is this.Tasks_List')
-      console.log(this.Tasks_List)
+      // console.log('this is this.Tasks_List')
+      // console.log(this.Tasks_List)
 
     },
     goBack(){
@@ -216,6 +224,7 @@ export default {
             }])
             //将最近选中的节点请求axios读取节点信息
             this.curSelectNode = node
+            getNodeByNodeAntvx6Id
             api.getNodeByNodeId(node.id).then(res =>{
                 this.cur_select_node = res.data.valueMap.data;
                 let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
@@ -275,8 +284,6 @@ export default {
           nodesep: 15,
           controlPoints: true,
         })
-
-      
       await this.initDate()//获取数据proExecutions和Tasks_List
       //将所有tasks的添加进入图里面,一份proExection对应一份tasks
       for(let i = 0; i < this.Tasks_List.length;i++)
@@ -285,44 +292,13 @@ export default {
         let proExecution = this.proExecutions[i]
         this.data_with_nodes_edges = await dataApi.addNodesEdgesByTasks(tasks,this.data_with_nodes_edges,proExecution)
       }
-      const newData = dagreLayout.layout(this.data_with_nodes_edges)
-      this.graph.fromJSON(newData)
-    },
-
-      /**
-       * 启动选中将给定节点地址闪烁
-       * @param {想要闪烁的节点的x} nodeX 
-       * @param {想要闪烁的节点的y} nodeY 
-       */
-       currentNodeFlashing(nodeX,nodeY)//
-      {
-        const polygon = this.graph.addNode({
-          id: 0,
-          shape: 'polygon',
-          x: nodeX,
-          y: nodeY+50,
-          width: 30,
-          height: 30,
-          points:
-            '26.934,1.318 35.256,18.182 53.867,20.887 40.4,34.013 43.579,52.549 26.934,43.798 10.288,52.549 13.467,34.013 0,20.887 18.611,18.182',
-          attrs: {
-            body: {
-              stroke: 'none',
-            },
-          },
-        })
-        const view = this.graph.findView(polygon)
-        if (view) {
-          view.animate('polygon', {
-            attributeType: 'XML',
-            attributeName: 'fill',
-            values: '#5F95FF;#EFF4FF',
-            dur: '1s',
-            repeatCount: 'indefinite',
-          })
-        }
-      },
-      
+      let graphdata_with_nodes_edges = dagreLayout.layout(this.data_with_nodes_edges)
+      this.graph.fromJSON(graphdata_with_nodes_edges)
+  
+     //更新cur_run_node
+      this.cur_run_node =  await dataApi.getNodeByNodeAntvx6Id(this.data_with_nodes_edges.nodes[0].id,this.Tasks_List)
+      this.cur_run_node.node_antvx6_id = this.data_with_nodes_edges.nodes[0].id;
+    }, 
       
       /**
        * 初始化节点
@@ -338,11 +314,11 @@ export default {
                 modifiers: 'shift',
             },
           container: document.getElementById('container'),
-          width: 800,
+          width: 1400,
           height: 600,
-          background: {
-            color: '#fffbe6', // 设置画布背景颜色
-          },
+          // background: {
+          //   color: '#fffbe6', // 设置画布背景颜色
+          // },
           grid: {
             size: 10,      // 网格大小 10px
             visible: true, // 渲染网格背景
@@ -371,34 +347,44 @@ export default {
        * */
       onGoBackNodeClick()
       {
-
+      //找到上一个node
+        let targetNode_id = this.cur_run_node.node_antvx6_id
+        let edges = this.data_with_nodes_edges.edges
+        let last_node_antvx6_id
+        edges.forEach(edge => {
+          if(edge.target == targetNode_id)
+          {
+            last_node_antvx6_id = edge.source
+          };
+        })
+        let new_cur_node = dataApi.getNodeByNodeAntvx6Id(last_node_antvx6_id,this.Tasks_List)
+        //将new_cur_node赋值为新的cur_run_node
+        this.update_cur_run_node(new_cur_node)
+        //根据新的cur_run_node更新this.next_node_choice
+        this.update_next_node_choices(this.cur_run_node)
       },
       /**
        * 按按钮进入下一节点
        * */
       onGoNextNodeClick()
       {
-        //传过来的这个next_node_choice_id是proExecutionId_processNodeId
-        //对其进行proExecutionId和processNodeId拿到nodeId信息
-        let proExecutionId = this.next_node_choice_id.split('_')[0]
-        let processNodeId = this.next_node_choice_id.split('_')[1]
-        TODO
-        TODO
-        TODO
-        TODO
-        TODO
-        TODO
-        TODO
-        //TODO: 对其进行proExecutionId和processNodeId拿到nodeId信息
-        console.log()
-        this.update_cur_run_node()
+        //对其进行this.next_node_choice_id拿到node信息
+        let new_cur_node = dataApi.getNodeByNodeAntvx6Id(this.next_node_choice_id,this.Tasks_List)
+        // console.log("new_cur_node:")
+        // console.log(new_cur_node)
+        new_cur_node.node_antvx6_id = this.next_node_choice_id//给下一个点node额外补充node_antvx6_Id属性
+        this.update_cur_run_node(new_cur_node)//更新当前运行节点
+        this.update_next_node_choices(this.cur_run_node)//更新下一节点选项
+        //更新进度条
+        this.update_percentage()//更新进度条
       },
        /**
-       * 更新单选框中下一节点选项
+       * 根据已经更新好的当前的cur_run_node，来更新单选框中下一节点选项
+       * @param {想要自己的节点被展示出下一选项的节点}cur_run_node
        * */
-       update_next_node_choices(){
+       update_next_node_choices(cur_run_node){
         this.next_node_choices = []
-        let sourceNode_id = this.cur_run_node.node_antvx6_id
+        let sourceNode_id = cur_run_node.node_antvx6_id
         let edges = this.data_with_nodes_edges.edges
         let nodes = this.data_with_nodes_edges.nodes
         edges.forEach(edge => {
@@ -417,12 +403,50 @@ export default {
             })
           }
         });
+        //刷新选项id这样才可以正常运行
+        this.next_node_choice_id= this.next_node_choices[0].node_antvx6_id
+        //更新进度条
+        this.update_percentage()//更新进度条
       },
       /**
-       * 更新当前运行节点,根据输入进来的nodeId改变cur_run_node
+       * 更新当前运行节点
+       * 将入参new_cur_node赋值为新的this.cur_run_node,补齐antvx6_id属性
+       * 为新节点加入选中特效，为旧节点删除选中特效
+       * @param {node} 新的new_cur_node
        * */
-       async update_cur_run_node(new_cur_node_id){
-        this.cur_run_node = await dataApi.getNodeByNodeId(new_cur_node_id)
+       async update_cur_run_node(new_cur_node){
+        let new_cur_antvx6_node_id = new_cur_node.node_antvx6_id  //新id
+        let last_cur_antvx6_node_id = this.cur_run_node.node_antvx6_id  //旧id
+        this.cur_run_node = new_cur_node//更新信息
+        let nodes = this.data_with_nodes_edges.nodes
+        nodes.forEach((node) => 
+        {
+          if(node.id == last_cur_antvx6_node_id)
+          {
+            node.attrs={
+              body: {
+                  fill: '#855af2',
+                  stroke: 'transparent',
+                },
+                label: {
+                  fill: '#ffffff',
+                },
+            }//恢复上一个当前运行节点特效变为正常
+          }
+          if(node.id == new_cur_antvx6_node_id)//新节点加入当前运行节点特效
+          {
+              // console.log("发现node")
+              node.attrs={
+                body: {
+                  fill: 'blue',
+                },
+                label: {
+                  fill: 'white',
+                },
+              }
+          }
+        })
+        this.graph.fromJSON(this.data_with_nodes_edges)
       },
   }
 }

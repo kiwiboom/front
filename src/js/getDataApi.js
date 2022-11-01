@@ -197,6 +197,32 @@ const dateApi ={
         // console.log("这是TasksList")
         // console.log(Tasks_List)
         return Tasks_List;
+    },
+
+    /**
+     * 通过node_antvx6_id查询所属tasks存储的对应的node信息
+     * @param {Id} node_antvx6_id 
+     * @param {含所属的tasks的所有tasksList} Tasks_list
+     * @return {node} node_antvx6_id查询所属tasks存储的对应的node
+     */
+     getNodeByNodeAntvx6Id(node_antvx6_id,Tasks_list)
+    {
+      let proExecutionId = parseInt(node_antvx6_id.split('_')[0])
+      let processNodeId = parseInt(node_antvx6_id.split('_')[1])
+      let node;
+      Tasks_list.forEach((tasks)=>{
+        tasks.forEach((task)=>
+        {
+          // console.log(task.proExecutionId)
+          // console.log(task.processNode.id)
+          if(task.proExecutionId === proExecutionId && task.processNode.id === processNodeId )
+          {
+            node = task.processNode.node
+            return node
+          }
+        })
+      })
+      return node
     }
 }
 export default dateApi
