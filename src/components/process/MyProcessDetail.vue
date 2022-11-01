@@ -164,25 +164,36 @@ export default {
      * */
     edgeAddEvent(){
       this.graph.on('edge:click', ({ e, x, y, edge, view }) => { 
-       edge.appendLabel('edge')
-       edge.attr({
-          line: {
-            targetMarker: {
-              tagName: 'image',
-              'xlink:href': 'http://cdn3.iconfinder.com/data/icons/49handdrawing/24x24/left.png',
-              width: 24,
-              height: 24,
-              y: -12,
-            }
-          }
-        })
-        edge.prop('labels/0', {
-          attrs: {
-            body: {
-              stroke: 'orange',
-            },
-          },
-        })
+      //点击之后的特殊样式
+      //  edge.appendLabel('edge')
+      //  edge.attr({
+      //     line: {
+      //       targetMarker: {
+      //         tagName: 'image',
+      //         'xlink:href': 'http://cdn3.iconfinder.com/data/icons/49handdrawing/24x24/left.png',
+      //         width: 24,
+      //         height: 24,
+      //         y: -12,
+      //       }
+      //     }
+      //   })
+      //   edge.prop('labels/0', {
+      //     attrs: {
+      //       body: {
+      //         stroke: 'orange',
+      //       },
+      //     },
+      //   })
+        let sourceNode_id = edge.source.cell
+        let targetNode_id = edge.target.cell
+        let source_task = dataApi.getTaskByNodeAntvx6Id(sourceNode_id,this.Tasks_List)
+        let source_task_message = source_task.message
+
+        let target_task = dataApi.getTaskByNodeAntvx6Id(targetNode_id,this.Tasks_List)
+        let target_task_message = target_task.message
+
+        let alert_content = 'source:'+ ' ' + source_task_message + ' ' +'\n' +'target:' + ' ' + target_task_message
+        this.myAlertPop("查询到该边信息",alert_content)
       })
     },
     /**
@@ -224,14 +235,11 @@ export default {
             }])
             //将最近选中的节点请求axios读取节点信息
             this.curSelectNode = node
-            getNodeByNodeAntvx6Id
-            api.getNodeByNodeId(node.id).then(res =>{
-                this.cur_select_node = res.data.valueMap.data;
-                let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
+            this.cur_select_node  = dataApi.getNodeByNodeAntvx6Id(node.id,this.Tasks_List)
+            let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
                 +"type:" + this.cur_select_node.type +'\n' +'ip:'+this.cur_select_node.ip +'\n' +'port:'+this.cur_select_node.port+'\n'
                 +"path:" + this.cur_select_node.path +'\n'
-                this.myAlertPop("查询到该节点信息",alert_content)
-                })
+            this.myAlertPop("查询到该节点信息",alert_content)
           } else {
             this.curSelectNode = null
           }
@@ -260,14 +268,11 @@ export default {
           }])
           //将最近选中的节点请求axios读取节点信息
           this.curSelectNode = node
-            api.getNodeByNodeId(node.id).then(res =>{
-                this.cur_select_node = res.data.valueMap.data;
-                let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
-                +"type:" + this.cur_select_node.type +'\n' +'ip:'+this.cur_select_node.ip +'\n' +'port:'+this.cur_select_node.port+'\n'
-                +"path:" + this.cur_select_node.path +'\n'
-                this.myAlertPop("查询到该节点信息",alert_content)
-                console.log(this.cur_select_node)
-                })
+          this.cur_select_node  = dataApi.getNodeByNodeAntvx6Id(node.id,this.Tasks_List)
+          let alert_content = "id:" + this.cur_select_node.id +'\n' +'name:'+this.cur_select_node.name+"\n"
+              +"type:" + this.cur_select_node.type +'\n' +'ip:'+this.cur_select_node.ip +'\n' +'port:'+this.cur_select_node.port+'\n'
+              +"path:" + this.cur_select_node.path +'\n'
+          this.myAlertPop("查询到该节点信息",alert_content)
         }
       })
     },

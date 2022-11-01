@@ -223,6 +223,32 @@ const dateApi ={
         })
       })
       return node
-    }
+    },
+
+        /**
+     * 通过node_antvx6_id查询所属task
+     * @param {Id} node_antvx6_id 
+     * @param {含所属的tasks的所有tasksList} Tasks_list
+     * @return {node} node_antvx6_id查询所属task
+     */
+      getTaskByNodeAntvx6Id(node_antvx6_id,Tasks_list)
+      {
+        let proExecutionId = parseInt(node_antvx6_id.split('_')[0])
+        let processNodeId = parseInt(node_antvx6_id.split('_')[1])
+        let taskRes;
+        Tasks_list.forEach((tasks)=>{
+          tasks.forEach((task)=>
+          {
+            // console.log(task.proExecutionId)
+            // console.log(task.processNode.id)
+            if(task.proExecutionId === proExecutionId && task.processNode.id === processNodeId )
+            {
+              taskRes = task
+              return taskRes
+            }
+          })
+        })
+        return taskRes
+      }
 }
 export default dateApi
